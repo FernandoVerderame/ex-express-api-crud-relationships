@@ -62,6 +62,18 @@ const index = async (req, res, next) => {
 
         const posts = await prisma.post.findMany({
             where,
+            include: {
+                category: {
+                    select: {
+                        name: true
+                    }
+                },
+                tags: {
+                    select: {
+                        name: true
+                    }
+                }
+            },
             take: parseInt(limit),
             skip: parseInt(offset)
         });
@@ -81,7 +93,19 @@ const show = async (req, res, next) => {
     try {
         const { slug } = req.params;
         const post = await prisma.post.findUnique({
-            where: { slug: slug }
+            where: { slug },
+            include: {
+                category: {
+                    select: {
+                        name: true
+                    }
+                },
+                tags: {
+                    select: {
+                        name: true
+                    }
+                }
+            }
         });
 
         if (post) {
