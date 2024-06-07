@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "dev": "nodemon app.js",
-    "migrate": "prisma migrate dev --name"
+    "migrate": "prisma migrate dev --name",
+    "seeder": "node seeder.js"
   },
   "keywords": [],
   "author": "",
