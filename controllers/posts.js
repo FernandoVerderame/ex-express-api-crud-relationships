@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 const createSlug = require("../utils/slug.js");
 
 // Store dei Posts
-const store = async (req, res, next) => {
+const store = async (req, res) => {
 
     const { title, content, categoryId, tags } = req.body;
 
@@ -21,32 +21,26 @@ const store = async (req, res, next) => {
         image: req.body.image ? req.body.image : '',
         content,
         published: req.body.published ? true : false,
+        categoryId: categoryId ? categoryId : '',
         tags: {
             connect: tags.map(id => ({ id }))
         }
     }
 
-    if (categoryId) {
-        data.categoryId = categoryId;
-    }
-
     try {
         const post = await prisma.post.create({
-            data: {
-                ...data,
-
-            }
+            data
         });
         res.status(200).send(post);
     } catch (err) {
-        next(err);
+        // next(err);
+        console.error(err);
     }
 }
 
 
 // Index dei Posts
-const index = async (req, res, next) => {
-
+const index = async (req, res) => {
     try {
         const where = {};
         const { published, text, page = 1, limit = 5 } = req.query;
@@ -96,12 +90,14 @@ const index = async (req, res, next) => {
             totalPages
         });
     } catch (err) {
-        next(err);
+        // next(err);
+        console.error(err);
     }
 }
 
 // Show dei Posts
-const show = async (req, res, next) => {
+const show = async (req, res) => {
+    console.log(req)
     try {
         const { slug } = req.params;
         const post = await prisma.post.findUnique({
@@ -127,43 +123,46 @@ const show = async (req, res, next) => {
         }
 
     } catch (err) {
-        next(err);
+        // next(err);
+        console.error(err);
     }
 }
 
 // Update dei Posts
-const update = async (req, res, next) => {
+const update = async (req, res) => {
     try {
         const { slug } = req.params;
         const { title, content, categoryId, tags } = req.body;
 
+        // Genero lo slug
+        const newSlug = createSlug(title);
+
         const data = {
             title,
-            slug,
+            slug: newSlug,
             image: req.body.image ? req.body.image : '',
             content,
             published: req.body.published ? true : false,
+            categoryId: categoryId ? categoryId : '',
             tags: {
                 set: tags.map(id => ({ id }))
             }
         }
 
-        if (categoryId) {
-            data.categoryId = categoryId;
-        }
-
         const post = await prisma.post.update({
             where: { slug },
-            data: req.body
+            data
         });
         res.json(post);
     } catch (err) {
-        next(err);
+        // next(err);
+        console.error(err);
+        res.status(500).send("Server Error");
     }
 }
 
 // Destroy dei Posts
-const destroy = async (req, res, next) => {
+const destroy = async (req, res) => {
     try {
         const { slug } = req.params;
         const post = await prisma.post.delete({
@@ -171,7 +170,8 @@ const destroy = async (req, res, next) => {
         });
         res.json(`Post con slug ${slug} eliminato con successo.`);
     } catch (err) {
-        next(err);
+        // next(err);
+        console.error(err);
     }
 }
 
