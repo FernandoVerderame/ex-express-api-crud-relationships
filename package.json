@@ -1,0 +1,22 @@
+{
+  "name": "express-api-crud",
+  "version": "1.0.0",
+  "description": "Iniziamo a creare le API per il nostro blog. Iniziate con un nuovo progetto Express + Prisma.",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "migrate": "prisma migrate dev --name"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.15.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "prisma": "^5.15.0",
+    "nodemon": "^3.1.3"
+  }
+}
