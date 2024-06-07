@@ -10,7 +10,7 @@ const createSlug = require("../utils/slug.js");
 // Store dei Posts
 const store = async (req, res, next) => {
 
-    const { title, content } = req.body;
+    const { title, content, categoryId, tags } = req.body;
 
     // Genero lo slug
     const slug = createSlug(title);
@@ -20,11 +20,23 @@ const store = async (req, res, next) => {
         slug: slug,
         image: req.body.image ? req.body.image : '',
         content,
-        published: req.body.published ? true : false
+        published: req.body.published ? true : false,
+        tags: {
+            connect: tags.map(id => ({ id }))
+        }
+    }
+
+    if (categoryId) {
+        data.categoryId = categoryId;
     }
 
     try {
-        const post = await prisma.post.create({ data });
+        const post = await prisma.post.create({
+            data: {
+                ...data,
+
+            }
+        });
         res.status(200).send(post);
     } catch (err) {
         next(err);
@@ -62,6 +74,18 @@ const index = async (req, res, next) => {
 
         const posts = await prisma.post.findMany({
             where,
+            include: {
+                category: {
+                    select: {
+                        name: true
+                    }
+                },
+                tags: {
+                    select: {
+                        name: true
+                    }
+                }
+            },
             take: parseInt(limit),
             skip: parseInt(offset)
         });
@@ -81,7 +105,19 @@ const show = async (req, res, next) => {
     try {
         const { slug } = req.params;
         const post = await prisma.post.findUnique({
-            where: { slug: slug }
+            where: { slug },
+            include: {
+                category: {
+                    select: {
+                        name: true
+                    }
+                },
+                tags: {
+                    select: {
+                        name: true
+                    }
+                }
+            }
         });
 
         if (post) {
@@ -99,6 +135,23 @@ const show = async (req, res, next) => {
 const update = async (req, res, next) => {
     try {
         const { slug } = req.params;
+        const { title, content, categoryId, tags } = req.body;
+
+        const data = {
+            title,
+            slug,
+            image: req.body.image ? req.body.image : '',
+            content,
+            published: req.body.published ? true : false,
+            tags: {
+                set: tags.map(id => ({ id }))
+            }
+        }
+
+        if (categoryId) {
+            data.categoryId = categoryId;
+        }
+
         const post = await prisma.post.update({
             where: { slug },
             data: req.body
