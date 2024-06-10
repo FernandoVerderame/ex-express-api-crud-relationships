@@ -116,11 +116,7 @@ const show = async (req, res) => {
             }
         });
 
-        if (post) {
-            res.json(post);
-        } else {
-            res.status(404).json({ error: `Post con slug ${slug} non trovata` })
-        }
+        res.json(post);
 
     } catch (err) {
         // next(err);
