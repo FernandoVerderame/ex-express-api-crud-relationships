@@ -4,6 +4,9 @@ const express = require("express");
 // Istanza di express.Router()
 const router = express.Router();
 
+// Importo il viladatore
+const validator = require('../middlewares/validator.js');
+
 // Importo le funzioni dei Posts
 const {
     store,
